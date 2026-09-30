@@ -1,0 +1,13 @@
+GRID3 BACKUP
+Backup date: Wed Sep 30 17:00:58 UTC 2026
+Python: Python 3.9.25
+Node: v22.23.3
+npm: 10.9.9
+PM2: 7.0.4
+OS: Amazon Linux release 2023.12.20260918 (Amazon Linux)
+Bot: new_grid_bot.py
+PM2 app: grid3
+Product: ETHUSD
+Product ID: 3136
+Credentials: AWS Secrets Manager / Bhavu
+Credentials are NOT stored in this repository.

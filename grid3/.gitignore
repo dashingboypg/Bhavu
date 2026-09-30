@@ -3,3 +3,7 @@ __pycache__/
 deltaenv/
 .env
 *.log
+*.pem
+*.key
+*.secret
+secrets/

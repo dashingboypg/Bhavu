@@ -80,8 +80,8 @@
   },
   "sells": {},
   "version": 1,
-  "bot_position": 2,
-  "next_sequence": 20,
+  "bot_position": 0,
+  "next_sequence": 22,
   "initialized": true,
   "orders": {
     "1574283042": {
@@ -230,7 +230,8 @@
       "price": 2690.3,
       "size": 1,
       "client_order_id": "G3R-S-18-6313ff",
-      "handled": false
+      "handled": true,
+      "fill_price": 2690.3
     },
     "1574313723": {
       "role": "S",
@@ -238,6 +239,23 @@
       "price": 2688.0,
       "size": 1,
       "client_order_id": "G3R-S-19-f64cb9",
+      "handled": true,
+      "fill_price": 2688.0
+    },
+    "1574338881": {
+      "role": "B",
+      "side": "buy",
+      "price": 2685.0,
+      "size": 1,
+      "client_order_id": "G3R-B-20-ce3e66",
+      "handled": false
+    },
+    "1574339760": {
+      "role": "B",
+      "side": "buy",
+      "price": 2687.3,
+      "size": 1,
+      "client_order_id": "G3R-B-21-539efc",
       "handled": false
     }
   }
