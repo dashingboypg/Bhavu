@@ -144,7 +144,7 @@ def round_cmp(price):
         rounding=ROUND_HALF_UP
     )
 
-    return float(rounded)
+    return int(rounded)
 
 
 def price_string(price):
@@ -293,6 +293,47 @@ def place_limit(side, price, role):
 
 
 # ============================================================
+# STARTUP STATE REPAIR
+# ============================================================
+
+def repair_initialization_state():
+    if not STATE.get("initialized"):
+        return
+
+    live_bot_orders = get_bot_open_orders()
+
+    if live_bot_orders:
+        return
+
+    try:
+        position = client.get_position(PRODUCT_ID)
+        position_size = int(float(position.get("size", 0) or 0))
+    except Exception as e:
+        log(f"STARTUP STATE CHECK ERROR | {type(e).__name__}: {e}")
+        return
+
+    if position_size != 0:
+        log(
+            f"STARTUP STATE PRESERVED | "
+            f"POSITION={position_size} | NO LIVE BOT ORDERS"
+        )
+        return
+
+    log(
+        "STARTUP STATE REPAIR | "
+        "initialized=True + no live bot orders + position=0"
+    )
+
+    STATE["initialized"] = False
+    STATE["bot_position"] = 0
+    STATE["orders"] = {}
+
+    save_state()
+
+    log("STARTUP STATE REPAIRED | FRESH GRID WILL BE CREATED")
+
+
+# ============================================================
 # INITIAL GRID
 # ============================================================
 
@@ -301,7 +342,7 @@ def initialize_grid():
         return
 
     cmp = get_cmp()
-    anchor = round_cmp(cmp)
+    anchor = int(round_cmp(cmp))
 
     log("==========================================")
     log("NEW CLEAN ETHUSD GRID3")
@@ -525,6 +566,7 @@ def main():
 
     log(f"Delta API OK. CMP: {cmp}")
 
+    repair_initialization_state()
     initialize_grid()
 
     log("GRID3 RUNNING")
