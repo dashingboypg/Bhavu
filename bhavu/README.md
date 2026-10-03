@@ -1,4 +1,4 @@
-# Grid3 ETHUSD Bot
+# Bhavu ETHUSD Bot
 
 Delta Exchange India ETHUSD grid bot.
 
@@ -8,6 +8,6 @@ Delta Exchange India ETHUSD grid bot.
 - Order size: 1 lot
 - Maximum position: 15 lots
 - Credentials/configuration: AWS Secrets Manager secret `Bhavu`
-- PM2 process: `grid3`
+- PM2 process: `bhavu`
 
 AWS credentials and API secrets are intentionally not stored in this repository.

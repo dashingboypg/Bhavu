@@ -8,7 +8,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from delta_rest_client import DeltaRestClient
 
 # ============================================================
-# GRID3 - CLEAN REBUILD
+# BHAVU - CLEAN GRID REBUILD
 # ============================================================
 
 SECRET_NAME = "Bhavu"
@@ -19,10 +19,10 @@ BASE_URL = "https://api.india.delta.exchange"
 SYMBOL = "ETHUSD"
 PRODUCT_ID = 3136
 
-STATE_FILE = "/home/ec2-user/delta-bot/grid3_state.json"
+STATE_FILE = "/home/ec2-user/delta-bot/bhavu/bhavu_state.json"
 
 # Only orders created by THIS bot have this prefix.
-BOT_PREFIX = "G3R-"
+BOT_PREFIX = "BHV-"
 
 POLL_SECONDS = 2
 
@@ -59,6 +59,7 @@ def load_secret():
     max_position_raw = str(data.get("Max_Position", "15"))
     order_size_raw = str(data.get("Order_Size", "1"))
     step_raw = str(data.get("Step", "3"))
+    counter_step_raw = str(data.get("Counter_Step", step_raw))
 
     max_position = int(
         float(max_position_raw.replace("lots", "").strip())
@@ -71,6 +72,7 @@ def load_secret():
     step = float(
         step_raw.replace("$", "").replace(",", "").strip()
     )
+    counter_step = float(counter_step_raw.replace("$", "").replace(",", "").strip())
 
     return (
         api_key,
@@ -78,6 +80,7 @@ def load_secret():
         max_position,
         order_size,
         step,
+        counter_step,
     )
 
 
@@ -158,7 +161,7 @@ def price_string(price):
 # DELTA CLIENT
 # ============================================================
 
-API_KEY, API_SECRET, MAX_POSITION, ORDER_SIZE, STEP = load_secret()
+API_KEY, API_SECRET, MAX_POSITION, ORDER_SIZE, STEP, COUNTER_STEP = load_secret()
 
 client = DeltaRestClient(
     base_url=BASE_URL,
@@ -341,11 +344,23 @@ def initialize_grid():
     if STATE["initialized"]:
         return
 
+    # Never create a duplicate grid if live Bhavu orders already exist.
+    live_bot_orders = get_bot_open_orders()
+
+    if live_bot_orders:
+        log(
+            f"STARTUP RECOVERY | FOUND {len(live_bot_orders)} LIVE BHV ORDERS | "
+            "SKIPPING NEW GRID"
+        )
+        STATE["initialized"] = True
+        save_state()
+        return
+
     cmp = get_cmp()
     anchor = int(round_cmp(cmp))
 
     log("==========================================")
-    log("NEW CLEAN ETHUSD GRID3")
+    log("NEW CLEAN ETHUSD BHAVU GRID")
     log("==========================================")
     log(f"STEP: {STEP}")
     log(f"ORDER SIZE: {ORDER_SIZE}")
@@ -409,7 +424,7 @@ def handle_buy_fill(order_id, info, order):
     )
 
     # Corresponding sell is exactly $3 higher.
-    sell_price = buy_price + STEP
+    sell_price = buy_price + COUNTER_STEP
 
     place_limit(
         side="sell",
@@ -447,7 +462,7 @@ def handle_sell_fill(order_id, info, order):
     )
 
     # Rebuy exactly $3 below the sell.
-    buy_price = sell_price - STEP
+    buy_price = sell_price - COUNTER_STEP
 
     if STATE["bot_position"] + ORDER_SIZE <= MAX_POSITION:
         place_limit(
@@ -548,7 +563,7 @@ def reconcile():
 def main():
 
     log("==========================================")
-    log("STARTING CLEAN GRID3")
+    log("STARTING CLEAN BHAVU GRID")
     log("==========================================")
 
     log("Credentials loaded from AWS secret: Bhavu")
@@ -569,7 +584,7 @@ def main():
     repair_initialization_state()
     initialize_grid()
 
-    log("GRID3 RUNNING")
+    log("BHAVU GRID RUNNING")
 
     while True:
         try:
@@ -578,7 +593,7 @@ def main():
             time.sleep(POLL_SECONDS)
 
         except KeyboardInterrupt:
-            log("GRID3 STOPPED")
+            log("BHAVU GRID STOPPED")
             break
 
         except Exception as e:

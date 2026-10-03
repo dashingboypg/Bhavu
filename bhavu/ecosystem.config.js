@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: "grid3",
+    name: "bhavu",
     script: "./new_grid_bot.py",
     cwd: __dirname,
     interpreter: __dirname + "/deltaenv/bin/python3",
